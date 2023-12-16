@@ -1,0 +1,9 @@
+{
+    "audio": ["mp3", "aac", "wav", "ogg", "flac"],
+    "video": ["mp4", "avi", "mkv", "mov", "wmv"],
+    "photo": ["jpeg", "jpg", "png", "gif", "svg"],
+    "web": ["html", "css"],
+    "programming": ["py", "cpp", "c++", "js"],
+    "text": ["docx", "txt"],
+    "pdf": ["pdf"]
+}

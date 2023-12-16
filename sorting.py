@@ -1,28 +1,41 @@
 import os
+import json
 import shutil
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
+from tkinter import messagebox
 
 
 class FileSorter:
 
     def __init__(self, master: Tk):
-        self.files_by_type = {
-            'audio': ('mp3', 'aac', 'wav', 'ogg', 'flac'),
-            'video': ('mp4', 'avi', 'mkv', 'mov', 'wmv'),
-            'photo': ('jpeg', 'jpg', 'png', 'gif', 'svg'),
-            'text': ('docx', 'txt'),
-            'pdf': ('pdf',)
-        }
+        self.files_by_type = self.load_extensions()
+        self.directory = None
 
         self.window = master
 
-        self.label = ttk.Label(self.window, text='Sort files by type', font='15')
-        self.label.place(relx=0.5, rely=0.3, anchor=CENTER)
+        self.label = ttk.Label(self.window, text='Choose directory')
+        self.label.grid(row=0, column=0, padx=10, pady=10)
 
-        self.button = ttk.Button(self.window, text='Choose directory', command=self.sort_files)
-        self.button.place(relx=0.5, rely=0.6, anchor=CENTER)
+        self.input = ttk.Entry(self.window, width=30)
+        self.input.grid(row=0, column=1)
+
+        self.browse_button = ttk.Button(self.window, text='Browse', command=self.browse_directory)
+        self.browse_button.grid(row=0, column=2, padx=10, pady=10)
+
+        self.sort_button = ttk.Button(self.window, text='Sort', command=self.sort_files)
+        self.sort_button.grid(row=1, column=2, padx=10, pady=10)
+
+        self.clear_button = ttk.Button(self.window, text='Clear', command=self.clear)
+        self.clear_button.grid(row=1, column=1, padx=[110, 0], pady=10)
+
+    def load_extensions(self):
+        with open('extensions.json', 'r') as file:
+            return json.load(file)
+
+    def clear(self):
+        self.input.delete(0, END)
 
     def get_file_type(self, file_extension: str):
         for file_type, extensions in self.files_by_type.items():
@@ -36,29 +49,41 @@ class FileSorter:
             os.mkdir(target_dir)
         shutil.move(src_path, os.path.join(target_dir, os.path.basename(src_path)))
 
-    def sort_files(self):
-        directory = filedialog.askdirectory()
+    def browse_directory(self):
+        self.directory = filedialog.askdirectory()
+        self.input.insert(0, self.directory)
 
-        if directory:
-            for file in os.listdir(directory):
-                file_path = os.path.join(directory, file)
+    def get_dir_path(self):
+        if dir_path := self.input.get():
+            self.directory = dir_path
+
+    def sort_files(self):
+        self.get_dir_path()
+
+        if self.directory:
+            for file in os.listdir(self.directory):
+                file_path = os.path.join(self.directory, file)
                 if os.path.isfile(file_path):
                     f_extension = os.path.splitext(file_path)[1][1:]
                     file_type = self.get_file_type(f_extension)
 
                     if file_type == 'other':
-                        target_path = os.path.join(directory, 'Other files')
+                        target_path = os.path.join(self.directory, 'Other files')
                     else:
-                        target_path = os.path.join(directory, file_type.capitalize() + 's')
+                        target_path = os.path.join(self.directory, file_type.capitalize() + ' files')
 
                     self.move_file(file_path, target_path)
-            os.startfile(directory)
+            self.clear()
+            os.startfile(self.directory)
+            self.directory = None
+        else:
+            messagebox.showwarning('Warning!', 'Specify directory for sorting')
 
 
 if __name__ == '__main__':
     window = Tk()
     window.title('File sorter')
-    window.geometry('300x200')
+    window.geometry('400x100')
     window.resizable(False, False)
 
     FileSorter(window)
