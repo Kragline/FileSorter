@@ -8,7 +8,6 @@ from tkinter import messagebox
 
 
 class FileSorter:
-
     def __init__(self, master: Tk):
         self.files_by_type = self.load_extensions()
         self.directory = None
@@ -28,36 +27,38 @@ class FileSorter:
         self.sort_button.grid(row=1, column=2, padx=10, pady=10)
 
         self.clear_button = ttk.Button(self.window, text='Clear', command=self.clear)
-        self.clear_button.grid(row=1, column=1, padx=[110, 0], pady=10)
+        self.clear_button.grid(row=1, column=1, padx=(110, 0), pady=10)
 
-    def load_extensions(self):
+    @classmethod
+    def __load_extensions(cls):
         with open('extensions.json', 'r') as file:
             return json.load(file)
 
-    def clear(self):
+    def __clear(self):
         self.input.delete(0, END)
 
-    def get_file_type(self, file_extension: str):
+    def __get_file_type(self, file_extension: str):
         for file_type, extensions in self.files_by_type.items():
             if file_extension.lower() in extensions:
                 return file_type
 
         return 'other'
 
-    def move_file(self, src_path, target_dir):
+    @classmethod
+    def __move_file(cls, src_path, target_dir):
         if not os.path.exists(target_dir):
             os.mkdir(target_dir)
-        shutil.move(src_path, os.path.join(target_dir, os.path.basename(src_path)))
+        shutil.move(str(src_path), str(os.path.join(target_dir, os.path.basename(src_path))))
 
-    def browse_directory(self):
+    def __browse_directory(self):
         self.directory = filedialog.askdirectory()
         self.input.insert(0, self.directory)
 
-    def get_dir_path(self):
+    def __get_dir_path(self):
         if dir_path := self.input.get():
             self.directory = dir_path
 
-    def sort_files(self):
+    def __sort_files(self):
         self.get_dir_path()
 
         if self.directory:
