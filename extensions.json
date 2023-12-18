@@ -4,6 +4,9 @@
     "photo": ["jpeg", "jpg", "png", "gif", "svg"],
     "web": ["html", "css"],
     "programming": ["py", "cpp", "c++", "js"],
+    "database": ["sql", "db"],
     "text": ["docx", "txt"],
+    "office": ["xlsx", "pptx"],
+    "archive": ["zip", "rar"],
     "pdf": ["pdf"]
 }
